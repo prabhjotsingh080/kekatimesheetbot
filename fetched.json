@@ -1,0 +1,67 @@
+{
+    "projects": [
+        {
+            "project": "CSIN-INTERN",
+            "phases": [
+                {
+                    "phase": "Training - Month 1 - Feb 2026",
+                    "tasks": [
+                        "AI-Connector Factory",
+                        "Basics of Maven and Dependency Scanning",
+                        "Klavyio HTTP Client",
+                        "Hubspot Integration",
+                        "Deep Dive: OpenAI's PostgreSQL Scaling Architecture",
+                        "GCP Fundamentals Badge",
+                        "GCP Fundamentals badge",
+                        "SQL Fundamentals + Python Basics + GCP Introduction+LINUX"
+                    ]
+                },
+                {
+                    "phase": "Training - Month 2 - Mar 2026",
+                    "tasks": [
+                        "New Response For Login API",
+                        "SQL Assignment",
+                        "Task Situation Based Git Practice",
+                        "Quality Assurance Testing (QAT) for Ticket #20 (Create Login and SignUp)",
+                        "CDAP Hands-On and Sanity Testing for Salesforce RTM",
+                        "Knightlab + SQL + Junit + Git",
+                        "TMS Project",
+                        "TMS Project + Streaming Solution for OOM Errors",
+                        "OCI Foundation",
+                        "CloudOps Training"
+                    ]
+                },
+                {
+                    "phase": "Training - Month 3 - Apr 2026",
+                    "tasks": [
+                        "TMS integrate download attachment api into frontend",
+                        "TMS integrated download attachment api into frontend",
+                        "TMS get user api integration"
+                    ]
+                }
+            ],
+            "standalone_tasks": [
+                "SMI Cabinetry",
+                "IR_STOCK implementation+Renaming",
+                "GCP+DAG Refinery",
+                "Hiring Copilot",
+                "TS - Stellar",
+                "Google ML Course",
+                "GCP + AI Agents",
+                "GCP + LineageGPT",
+                "GCP + NAMING AI AGENT + LINEAGEGPT",
+                "Training-Month 1",
+                "GCP+DCproject+KnowledgeGraph",
+                "Python+GCP+GIT",
+                "Interns Induction"
+            ]
+        },
+        {
+            "project": "DataPlex Connectors (10013250)",
+            "phases": [],
+            "standalone_tasks": [
+                "AI - Assets"
+            ]
+        }
+    ]
+}
