@@ -1,0 +1,160 @@
+--- Keka Automation Pipeline Logs (2026-05-05 17:39:41) ---
+
+Successfully generated input.json with 3 tasks.
+{
+  "tasks": [
+    {
+      "task": "AI - Assets",
+      "date": "2026-05-07",
+      "duration_hours": 9
+    },
+    {
+      "task": "Collibra - R&D",
+      "date": "2026-05-08",
+      "duration_hours": 5
+    },
+    {
+      "task": "Dataplex - R&D",
+      "date": "2026-05-08",
+      "duration_hours": 3
+    }
+  ]
+}
+[17:39:51] DEBUG    .env file loaded                                           
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│    Keka Timesheet Automation                                                │
+│    Powered by Playwright + Gemini AI                                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+────────────────────────── Step 1: Connect to Chrome ──────────────────────────
+           DEBUG    Starting new HTTP connection (1): localhost:9222           
+[17:39:53] DEBUG    http://localhost:9222 "GET /json/version HTTP/1.1" 200 423 
+           INFO     Connecting to Chrome on port 9222 ...                      
+           DEBUG    Using proactor: IocpProactor                               
+[17:39:55] INFO     Connected to Chrome                                        
+           INFO     Reusing existing Keka tab:                                 
+                    https://cloudsufi.keka.com/#/me/timesheet/all-timesheets?fr
+                    omTimesheet=false                                          
+           INFO     Already on timesheet page                                  
+──────────────────────── Step 2: Navigate to My Tasks ─────────────────────────
+Navigating to 'My Tasks'…
+──────────────── Step 3: Extracting Projects / Phases / Tasks ─────────────────
+Reading table data...
+──────────────────────────── Step 4: Save Results ─────────────────────────────
+✅  Extracted 4 project(s).
+💾  Saved to fetched.json
+
+Summary:
+  • Total Tasks Fetched: 4
+    - DataPlex Connectors (10013250): 4 tasks
+[17:40:01] DEBUG    .env file loaded                                           
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│    Keka Timesheet Automation                                                │
+│    Powered by Playwright + Gemini AI                                        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+─────────────────────── Step 1: Reading configurations ────────────────────────
+Found 3 tasks in input.json. Mapping to Keka counterparts...
+* Mapped AI - Assets -> Project: DataPlex Connectors (10013250), Task: AI - 
+Assets
+* Mapped Collibra - R&D -> Project: DataPlex Connectors (10013250), Task: 
+Collibra - R&D
+* Mapped Dataplex - R&D -> Project: DataPlex Connectors (10013250), Task: 
+Dataplex - R&D
+──────────────────────── Step 2: Expected Action Plan ─────────────────────────
+ - 2026-05-07: 9.0h (09:00-18:00) on DataPlex Connectors (10013250) -> AI - 
+Assets
+ - 2026-05-08: 5.0h (09:00-14:00) on DataPlex Connectors (10013250) -> Collibra
+- R&D
+ - 2026-05-08: 3.0h (09:00-12:00) on DataPlex Connectors (10013250) -> Dataplex
+- R&D
+──────────────────────── Step 3: Executing Automation ─────────────────────────
+           DEBUG    Starting new HTTP connection (1): localhost:9222           
+[17:40:03] DEBUG    http://localhost:9222 "GET /json/version HTTP/1.1" 200 423 
+           INFO     Connecting to Chrome on port 9222 ...                      
+           DEBUG    Using proactor: IocpProactor                               
+[17:40:09] INFO     Connected to Chrome                                        
+           INFO     Reusing existing Keka tab:                                 
+                    https://cloudsufi.keka.com/#/me/timesheet/my-tasks         
+           INFO     Already on timesheet page                                  
+[17:40:10] DEBUG    Timesheet grid verified                                    
+──────────────────────── Filling Entry 1/3: 2026-05-07 ────────────────────────
+           DEBUG    Could not read displayed week from DOM; falling back to    
+                    today                                                      
+           INFO     Already on the correct week for 2026-05-07                 
+           INFO     [FILL] 2026-05-07 | DataPlex Connectors (10013250) | AI -  
+                    Assets | 9.0h | 09:00-18:00                                
+           DEBUG    Timesheet grid verified                                    
+           INFO     Existing row for DataPlex Connectors (10013250) | AI -     
+                    Assets found. Using it directly.                           
+           DEBUG    Targeting cell for 2026-05-07 in row DataPlex Connectors   
+                    (10013250)|AI - Assets                                     
+           DEBUG    Day cell clicked via 'td_x_align' (dist=0.0px,             
+                    x=1050.6192779541016, y=428.9583435058594) header='07      
+                    MayThu'                                                    
+[17:40:12] DEBUG    Active time container found: .dropdown-menu.show           
+[17:40:16] DEBUG    Comment entered via: textarea                              
+[17:40:17] DEBUG    Save clicked via general selector: button:has-text('Save') 
+           INFO     [OK] Entry filled for 2026-05-07                           
+Successfully filled timesheet for 2026-05-07!
+──────────────────────── Filling Entry 2/3: 2026-05-08 ────────────────────────
+           DEBUG    Could not read displayed week from DOM; falling back to    
+                    today                                                      
+           INFO     Already on the correct week for 2026-05-08                 
+           INFO     [FILL] 2026-05-08 | DataPlex Connectors (10013250) |       
+                    Collibra - R&D | 5.0h | 09:00-14:00                        
+           DEBUG    Timesheet grid verified                                    
+           INFO     Existing row for DataPlex Connectors (10013250) | Collibra 
+                    - R&D found. Using it directly.                            
+           DEBUG    Targeting cell for 2026-05-08 in row DataPlex Connectors   
+                    (10013250)|Collibra - R&D                                  
+           DEBUG    Day cell clicked via 'td_x_align' (dist=0.0px,             
+                    x=1140.6077423095703, y=493.6805725097656) header='08      
+                    MayFri'                                                    
+[17:40:18] DEBUG    Active time container found: .dropdown-menu.show           
+[17:40:22] DEBUG    Comment entered via: textarea                              
+[17:40:53] DEBUG    Save clicked via general selector:                         
+                    button:has-text('Submit')                                  
+           INFO     [OK] Entry filled for 2026-05-08                           
+Successfully filled timesheet for 2026-05-08!
+──────────────────────── Filling Entry 3/3: 2026-05-08 ────────────────────────
+           DEBUG    Could not read displayed week from DOM; falling back to    
+                    today                                                      
+           INFO     Already on the correct week for 2026-05-08                 
+           INFO     [FILL] 2026-05-08 | DataPlex Connectors (10013250) |       
+                    Dataplex - R&D | 3.0h | 09:00-12:00                        
+[17:40:54] DEBUG    Timesheet grid verified                                    
+           DEBUG    Dismissed popup via: button:has-text('Close')              
+[17:40:55] INFO     Row for DataPlex Connectors (10013250) | Dataplex - R&D not
+                    found. Adding via sidebar...                               
+[17:40:56] DEBUG    Clicked 'Add Time Entry' via a:has-text('Add Time Entry')  
+[17:40:59] DEBUG    Dropdown panel not verified via selector, proceeding anyway
+[17:41:00] DEBUG    Project selection: CLICKED                                 
+[17:41:01] DEBUG    [JS-TASK] Iter 1: 20 items                                 
+           DEBUG    [JS-TASK] Item 1-20:                                       
+                    phasetasks|phasetasks|aiassetspefpgoogdplexncd8dataplexrdpe
+                    fpgoogdplexncd9collibrardpefpgoogdplexncd10atlanrdpefpgoogd
+                    plexncd11|aiassetspefpgoogdplexncd8dataplexrdpefpgoogdplexn
+                    cd9collibrardpefpgoogdplexncd10atlanrdpefpgoogdplexncd11|ai
+                    assetspefpgoogdplexncd8|aiassetspefpgoogdplexncd8|aiassets|
+                    pefpgoogdplexncd8|dataplexrdpefpgoogdplexncd9|dataplexrdpef
+                    pgoogdplexncd9|dataplexrd|pefpgoogdplexncd9|collibrardpefpg
+                    oogdplexncd10|collibrardpefpgoogdplexncd10|collibrard|pefpg
+                    oogdplexncd10|atlanrdpefpgoogdplexncd11|atlanrdpefpgoogdple
+                    xncd11|atlanrd|pefpgoogdplexncd11                          
+           DEBUG    Task selection result: CLICKED_TASK                        
+[17:41:05] DEBUG    Targeting cell for 2026-05-08 in row DataPlex Connectors   
+                    (10013250)|Dataplex - R&D                                  
+           DEBUG    Day cell clicked via 'td_x_align' (dist=0.0px,             
+                    x=1140.6077423095703, y=245.0694580078125) header='08      
+                    MayFri'                                                    
+[17:41:08] DEBUG    Active time container found: .dropdown-menu.show           
+[17:41:14] DEBUG    Comment entered via: textarea                              
+[17:41:47] DEBUG    Save clicked via general selector:                         
+                    button:has-text('Submit')                                  
+           INFO     [OK] Entry filled for 2026-05-08                           
+Successfully filled timesheet for 2026-05-08!
+
+Automation batch run complete.

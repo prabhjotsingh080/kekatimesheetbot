@@ -41,14 +41,26 @@ def get_task_mapping():
         try:
             with open("fetched.json", "r", encoding="utf-8") as f:
                 data = json.load(f)
-                for p in data.get("projects", []):
-                    p_name = p.get("project")
-                    for phase in p.get("phases", []):
-                        phase_name = phase.get("phase")
-                        for t in phase.get("tasks", []):
-                            mapping[normalize(t)] = (p_name, phase_name, t)
-                    for st in p.get("standalone_tasks", []):
-                        mapping[normalize(st)] = (p_name, None, st)
+                for item in data.get("projects", []):
+                    # Backward compatibility for old hierarchical format
+                    if "phases" in item or "standalone_tasks" in item:
+                        p_name = item.get("project")
+                        for phase in item.get("phases", []):
+                            phase_name = phase.get("phase")
+                            for t in phase.get("tasks", []):
+                                t_name = t if isinstance(t, str) else t.get("name", "")
+                                mapping[normalize(t_name)] = (p_name, phase_name, t_name)
+                        for st in item.get("standalone_tasks", []):
+                            st_name = st if isinstance(st, str) else st.get("name", "")
+                            mapping[normalize(st_name)] = (p_name, None, st_name)
+                    else:
+                        # New flat format
+                        t_name = item.get("name", "")
+                        p_name = item.get("project", "")
+                        phase_name = item.get("phase", "")
+                        if phase_name and phase_name.upper() == "NA":
+                            phase_name = None
+                        mapping[normalize(t_name)] = (p_name, phase_name, t_name)
         except Exception as e:
             console.print(f"[yellow]Warning: Could not read fetched.json: {e}[/yellow]")
             

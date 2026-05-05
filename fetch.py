@@ -60,200 +60,117 @@ _EXTRACT_JS = r"""
 async () => {
     const delay = ms => new Promise(res => setTimeout(res, ms));
 
-    // ─── Find the container element for a labelled column ───────────────────
-    const findCol = (title) => {
-        const labels = Array.from(document.querySelectorAll(
-            'label, .text-muted, span, small, h1, h2, h3, h4, h5, h6'
-        ));
-        let lb = labels.find(l => l.innerText.trim().toUpperCase() === title.toUpperCase());
-        if (!lb) lb = labels.find(l => l.innerText.trim().toUpperCase().includes(title.toUpperCase()));
-        if (!lb) return null;
-        let curr = lb.parentElement;
-        while (curr && curr !== document.body) {
-            if (curr.querySelector('.cursor-pointer')) return curr;
-            curr = curr.parentElement;
+    const allTasksMap = new Map();
+    let hasNextPage = true;
+    let loopGuard = 0;
+
+    while (hasNextPage && loopGuard < 20) {
+        loopGuard++;
+        await delay(1500); // Wait for data/table to render
+
+        // Find table rows: prefer standard <tr> inside <tbody>, fallback to role="row"
+        let rows = Array.from(document.querySelectorAll('tbody tr'));
+        if (rows.length === 0) {
+            rows = Array.from(document.querySelectorAll('.table-row, [role="row"]')).filter(r => {
+                // Filter out headers
+                return !r.querySelector('th, [role="columnheader"]') && r.innerText.trim() !== '';
+            });
         }
-        return lb.parentElement;
-    };
 
-    // ─── Locate the two columns ─────────────────────────────────────────────
-    const pContainer = findCol('PROJECTS');
-    const tContainer = findCol('PHASE/TASKS') || findCol('TASKS');
-
-    const allItems = Array.from(document.querySelectorAll('.cursor-pointer')).filter(el => {
-        const s = window.getComputedStyle(el);
-        return s.display !== 'none' && s.visibility !== 'hidden' && el.offsetHeight > 0;
-    });
-
-    if (allItems.length === 0) {
-        return { error: 'No clickable items visible. Is the Add Time Entry panel open?' };
-    }
-
-    // Horizontal boundary between the Projects column and the Phase/Tasks column
-    let splitX = 400;
-    if (pContainer && tContainer) {
-        splitX = (pContainer.getBoundingClientRect().right +
-                  tContainer.getBoundingClientRect().left) / 2;
-    } else {
-        const lefts = allItems.map(i => i.getBoundingClientRect().left);
-        splitX = (Math.min(...lefts) + Math.max(...lefts)) / 2 + 30;
-    }
-
-    // ─── Helpers to read the task column ────────────────────────────────────
-
-    // Returns all visible .cursor-pointer elements that live in the task column.
-    const getTaskColItems = () =>
-        Array.from(document.querySelectorAll('.cursor-pointer')).filter(el => {
-            const s = window.getComputedStyle(el);
-            return s.display !== 'none' &&
-                   s.visibility !== 'hidden' &&
-                   el.offsetHeight > 0 &&
-                   el.getBoundingClientRect().left >= splitX;
-        });
-
-    // Extract clean display text from an element.
-    const getText = (el) => {
-        const p = el.querySelector('p');
-        return (p ? p : el).innerText.split('\n')[0].trim();
-    };
-
-    // True if el is a phase header (has a collapsible chevron icon).
-    const isPhaseHeader = (el) =>
-        !!(el.querySelector('.ki-chevron-right') || el.querySelector('.ki-chevron-down'));
-
-    // Filter noise strings.
-    const isNoise = (t) =>
-        !t ||
-        t.length <= 2 ||
-        t.toLowerCase().includes('search') ||
-        t.toLowerCase().includes('no task') ||
-        t.toLowerCase().includes('attach file') ||
-        t.includes('Alt + K') ||
-        t.includes('+Add Task');
-
-    // ─── Per-project phase/task scraper ─────────────────────────────────────
-    const scrapeTaskCol = async () => {
-        // Step 1 – collapse any already-expanded phases for a clean slate
-        const downChevrons = Array.from(document.querySelectorAll('.ki-chevron-down')).filter(el => {
-            return el.getBoundingClientRect().left >= splitX && el.offsetHeight > 0;
-        });
-        for (const chev of downChevrons) {
-            chev.click();
-            await delay(250);
+        // Attempt to find column indices dynamically
+        let taskIdx = 0;
+        let phaseIdx = 1;
+        let projIdx = 2;
+        let pmIdx = 3;
+        let endIdx = 4;
+        let hrsIdx = 5;
+        let stageIdx = 6;
+        
+        const headers = Array.from(document.querySelectorAll('th, thead td, .header-cell, [role="columnheader"]'));
+        if (headers.length > 0) {
+            headers.forEach((h, i) => {
+                const text = h.innerText.trim().toUpperCase();
+                if (text === 'TASKS' || text === 'TASK') taskIdx = i;
+                else if (text === 'PHASE') phaseIdx = i;
+                else if (text === 'PROJECT' || text === 'PROJECTS') projIdx = i;
+                else if (text.includes('PROJECT MANAGER') || text.includes('MANAGER')) pmIdx = i;
+                else if (text.includes('END DATE')) endIdx = i;
+                else if (text.includes('HOURS') || text === 'HOURS') hrsIdx = i;
+                else if (text.includes('TASK STAGE') || text.includes('STAGE')) stageIdx = i;
+            });
         }
-        await delay(400);
 
-        // Step 2 – snapshot the collapsed state: only chevron items + standalone tasks visible
-        const baseItems   = getTaskColItems();
-        const baseNames   = new Set(baseItems.map(getText));
-
-        const phaseEls    = baseItems.filter(isPhaseHeader);
-        const standAlones = baseItems.filter(el => !isPhaseHeader(el)).map(getText).filter(t => !isNoise(t));
-
-        const phases = [];
-
-        // Step 3 – expand each phase one at a time and harvest its children
-        for (const phEl of phaseEls) {
-            const phaseName = getText(phEl);
-            if (isNoise(phaseName)) continue;
-
-            // Click the right-chevron to expand
-            const chevIcon = phEl.querySelector('.ki-chevron-right');
-            if (chevIcon) {
-                chevIcon.click();
-                await delay(600);
-            } else {
-                phEl.click();
-                await delay(600);
+        for (const row of rows) {
+            // Find cells: prefer <td>, fallback to role="cell" or children
+            let cells = Array.from(row.querySelectorAll('td'));
+            if (cells.length === 0) {
+                cells = Array.from(row.querySelectorAll('.table-cell, [role="cell"]'));
+            }
+            if (cells.length === 0) {
+                // Last fallback: direct child divs
+                cells = Array.from(row.children);
             }
 
-            // Children = newly appeared non-chevron items in task column
-            const afterItems = getTaskColItems();
-            const childTasks = afterItems
-                .filter(el => !isPhaseHeader(el) && !baseNames.has(getText(el)))
-                .map(getText)
-                .filter(t => !isNoise(t));
+            if (cells.length > Math.max(taskIdx, phaseIdx, projIdx)) {
+                let taskText = cells[taskIdx] ? cells[taskIdx].innerText.trim() : "";
+                let phaseText = cells[phaseIdx] ? cells[phaseIdx].innerText.trim() : "";
+                let projText = cells[projIdx] ? cells[projIdx].innerText.trim() : "";
+                let pmText = (cells[pmIdx]) ? cells[pmIdx].innerText.trim() : "";
+                let endText = (cells[endIdx]) ? cells[endIdx].innerText.trim() : "";
+                let hrsText = (cells[hrsIdx]) ? cells[hrsIdx].innerText.trim() : "";
+                let stageText = (cells[stageIdx]) ? cells[stageIdx].innerText.trim() : "";
 
-            // De-duplicate while preserving order
-            const seen = new Set();
-            const uniqueTasks = [];
-            for (const t of childTasks) {
-                if (!seen.has(t)) { seen.add(t); uniqueTasks.push(t); }
-            }
+                let taskName = taskText.split('\n')[0].trim();
+                let phaseName = phaseText.split('\n')[0].trim();
+                let projName = projText.split('\n')[0].trim();
 
-            phases.push({ phase: phaseName, tasks: uniqueTasks });
+                // If taskName is empty or it's a "No records found" row, skip
+                if (!taskName || taskName.toLowerCase().includes('no data') || !projName) continue;
 
-            // Collapse this phase again before processing the next
-            const downChev = phEl.querySelector('.ki-chevron-down');
-            if (downChev) {
-                downChev.click();
-                await delay(350);
+                let taskObj = {
+                    name: taskName,
+                    phase: phaseName,
+                    project: projName,
+                    project_manager: pmText.replace(/\n/g, ' ').trim(),
+                    end_date: endText.replace(/\n/g, ' ').trim(),
+                    hours: hrsText.replace(/\n/g, ' ').trim(),
+                    task_stage: stageText.replace(/\n/g, ' ').trim()
+                };
+                
+                // Use taskName + projName as unique key to prevent duplicates across pages
+                allTasksMap.set(`${taskName}::${projName}`, taskObj);
             }
         }
 
-        // De-duplicate standalone tasks
-        const seenSt = new Set();
-        const uniqueStandAlones = [];
-        for (const t of standAlones) {
-            if (!seenSt.has(t)) { seenSt.add(t); uniqueStandAlones.push(t); }
-        }
-
-        return { phases, standalone_tasks: uniqueStandAlones };
-    };
-
-    // ─── Main project iteration loop ────────────────────────────────────────
-    const projects = [];
-    const seenProjects = new Set();
-    let noNewCount = 0;
-    let lastScroll = -1;
-
-    if (pContainer) pContainer.scrollTop = 0;
-
-    while (noNewCount < 3) {
-        const visible = Array.from(document.querySelectorAll('.cursor-pointer')).filter(el => {
-            const s = window.getComputedStyle(el);
-            return s.display !== 'none' && s.visibility !== 'hidden' && el.offsetHeight > 0;
+        // Try to click "Next Page" if it exists and is not disabled
+        // Often pagination buttons have ki-chevron-right or text like ">"
+        const nextBtns = Array.from(document.querySelectorAll('button, a, .page-link, .ki-chevron-right')).filter(el => {
+            const text = el.innerText.trim();
+            const aria = el.getAttribute('aria-label') || '';
+            const className = el.className || '';
+            return text === '>' || aria.toLowerCase().includes('next') || className.includes('chevron-right');
         });
 
-        const projItems = visible.filter(el => el.getBoundingClientRect().left < splitX);
-        let foundNew = false;
-
-        for (const item of projItems) {
-            const nameEl = item.querySelector('p') || item.querySelector('div') || item;
-            const rawName = nameEl.innerText.split('\n')[0].trim();
-
-            if (!rawName ||
-                rawName.toLowerCase().includes('search') ||
-                rawName.includes('Alt + K') ||
-                rawName.toLowerCase().includes('attach file') ||
-                seenProjects.has(rawName)) continue;
-
-            foundNew = true;
-            seenProjects.add(rawName);
-
-            // Click project to populate the task column
-            try {
-                item.click();
-                await delay(1200);
-            } catch (e) { continue; }
-
-            const { phases, standalone_tasks } = await scrapeTaskCol();
-
-            projects.push({ project: rawName, phases, standalone_tasks });
+        let clickedNext = false;
+        for (const btn of nextBtns) {
+            const clickable = btn.closest('button') || btn.closest('a') || btn;
+            if (!clickable.disabled && !clickable.classList.contains('disabled') && !clickable.parentElement.classList.contains('disabled')) {
+                // Ensure it's actually visible
+                if (clickable.offsetWidth > 0 && clickable.offsetHeight > 0) {
+                    clickable.click();
+                    clickedNext = true;
+                    await delay(1000);
+                    break;
+                }
+            }
         }
-
-        if (!foundNew) noNewCount++; else noNewCount = 0;
-
-        if (pContainer) {
-            pContainer.scrollTop += 350;
-            await delay(600);
-            if (pContainer.scrollTop === lastScroll) break;
-            lastScroll = pContainer.scrollTop;
-        } else {
-            break;
+        
+        if (!clickedNext) {
+            hasNextPage = false;
         }
     }
 
+    const projects = Array.from(allTasksMap.values());
     return { projects };
 }
 """
@@ -276,25 +193,19 @@ def fetch(port: int = 9222, output: str = "fetched.json") -> dict:
         console.print(f"[bold red]{e}[/bold red]")
         sys.exit(1)
 
-    # Step 2 – open Add Time Entry panel
-    console.rule("[bold cyan]Step 2: Open Add Time Entry Panel[/bold cyan]")
-    console.print("[dim]Clicking 'Add Time Entry'…[/dim]")
+    # Step 2 – open My Tasks panel
+    console.rule("[bold cyan]Step 2: Navigate to My Tasks[/bold cyan]")
+    console.print("[dim]Navigating to 'My Tasks'…[/dim]")
     try:
-        if not page.locator("text=PHASE/TASKS").is_visible(timeout=2000):
-            page.locator("text=Add Time Entry").first.click()
-        page.wait_for_selector("text=PHASE/TASKS", timeout=15_000)
-        time.sleep(1.5)
+        page.goto("https://cloudsufi.keka.com/#/me/timesheet/my-tasks", wait_until="networkidle")
+        page.wait_for_timeout(3000) # Give UI time to load the table
     except Exception as e:
-        console.print(f"[bold red]Could not open 'Add Time Entry' panel: {e}[/bold red]")
-        console.print(
-            "[dim]Make sure you are on the Keka Timesheet page "
-            "(https://cloudsufi.keka.com/#/me/timesheet/all-timesheets)[/dim]"
-        )
+        console.print(f"[bold red]Could not navigate to 'My Tasks' page: {e}[/bold red]")
         sys.exit(1)
 
     # Step 3 – extract
     console.rule("[bold cyan]Step 3: Extracting Projects / Phases / Tasks[/bold cyan]")
-    console.print("[dim]Clicking through each project — this may take a minute…[/dim]")
+    console.print("[dim]Reading table data...[/dim]")
     data = page.evaluate(_EXTRACT_JS)
 
     # Step 4 – save
@@ -307,27 +218,28 @@ def fetch(port: int = 9222, output: str = "fetched.json") -> dict:
     projects = data.get("projects", [])
     if not projects:
         console.print(
-            "[bold yellow]⚠  No projects found. "
+            "[bold yellow]:warning:  No projects found. "
             "Ensure the Add Time Entry panel is open and has projects.[/bold yellow]"
         )
     else:
-        console.print(f"[bold green]✅  Extracted {len(projects)} project(s).[/bold green]")
+        console.print(f"[bold green]:white_check_mark:  Extracted {len(projects)} project(s).[/bold green]")
 
     with open(output, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
 
-    console.print(f"[bold blue]💾  Saved to [underline]{output}[/underline][/bold blue]")
+    console.print(f"[bold blue]:floppy_disk:  Saved to [underline]{output}[/underline][/bold blue]")
 
     console.print("\n[bold]Summary:[/bold]")
-    for p in projects:
-        phase_count = len(p.get("phases", []))
-        task_count  = sum(len(ph.get("tasks", [])) for ph in p.get("phases", []))
-        st_count    = len(p.get("standalone_tasks", []))
-        console.print(
-            f"  [cyan]•[/cyan] [bold]{p['project']}[/bold]  "
-            f"[dim]({phase_count} phase(s), {task_count} tasks inside phases, "
-            f"{st_count} standalone task(s))[/dim]"
-        )
+    console.print(f"  [cyan]•[/cyan] [bold]Total Tasks Fetched:[/bold] {len(projects)}")
+    
+    # Optional: group by project for the console output
+    proj_counts = {}
+    for task in projects:
+        p_name = task.get('project', 'Unknown')
+        proj_counts[p_name] = proj_counts.get(p_name, 0) + 1
+        
+    for p_name, count in proj_counts.items():
+        console.print(f"    - {p_name}: {count} tasks")
 
     browser.close()
     return data

@@ -1,24 +1,19 @@
 {
   "tasks": [
     {
-      "task": "OCI Foundation",
-      "date": "2026-05-09",
-      "duration_hours": 7
+      "task": "AI - Assets",
+      "date": "2026-05-07",
+      "duration_hours": 9
     },
     {
-      "task": "GCP+DAG Refinery",
-      "date": "2026-05-05",
-      "duration_hours": 8
-    },
-    {
-      "task": "Deep Dive: OpenAI's PostgreSQL Scaling Architecture",
-      "date": "2026-05-06",
+      "task": "Collibra - R&D",
+      "date": "2026-05-08",
       "duration_hours": 5
     },
     {
-      "task": "Hiring Copilot",
-      "date": "2026-05-04",
-      "duration_hours": 9
+      "task": "Dataplex - R&D",
+      "date": "2026-05-08",
+      "duration_hours": 3
     }
   ]
 }

@@ -1,67 +1,40 @@
 {
     "projects": [
         {
-            "project": "CSIN-INTERN",
-            "phases": [
-                {
-                    "phase": "Training - Month 1 - Feb 2026",
-                    "tasks": [
-                        "AI-Connector Factory",
-                        "Basics of Maven and Dependency Scanning",
-                        "Klavyio HTTP Client",
-                        "Hubspot Integration",
-                        "Deep Dive: OpenAI's PostgreSQL Scaling Architecture",
-                        "GCP Fundamentals Badge",
-                        "GCP Fundamentals badge",
-                        "SQL Fundamentals + Python Basics + GCP Introduction+LINUX"
-                    ]
-                },
-                {
-                    "phase": "Training - Month 2 - Mar 2026",
-                    "tasks": [
-                        "New Response For Login API",
-                        "SQL Assignment",
-                        "Task Situation Based Git Practice",
-                        "Quality Assurance Testing (QAT) for Ticket #20 (Create Login and SignUp)",
-                        "CDAP Hands-On and Sanity Testing for Salesforce RTM",
-                        "Knightlab + SQL + Junit + Git",
-                        "TMS Project",
-                        "TMS Project + Streaming Solution for OOM Errors",
-                        "OCI Foundation",
-                        "CloudOps Training"
-                    ]
-                },
-                {
-                    "phase": "Training - Month 3 - Apr 2026",
-                    "tasks": [
-                        "TMS integrate download attachment api into frontend",
-                        "TMS integrated download attachment api into frontend",
-                        "TMS get user api integration"
-                    ]
-                }
-            ],
-            "standalone_tasks": [
-                "SMI Cabinetry",
-                "IR_STOCK implementation+Renaming",
-                "GCP+DAG Refinery",
-                "Hiring Copilot",
-                "TS - Stellar",
-                "Google ML Course",
-                "GCP + AI Agents",
-                "GCP + LineageGPT",
-                "GCP + NAMING AI AGENT + LINEAGEGPT",
-                "Training-Month 1",
-                "GCP+DCproject+KnowledgeGraph",
-                "Python+GCP+GIT",
-                "Interns Induction"
-            ]
+            "name": "AI - Assets",
+            "phase": "NA",
+            "project": "DataPlex Connectors (10013250)",
+            "project_manager": "Poojan Ghanshyam Trivedi",
+            "end_date": "Aug 31, 2026  starts on Mar 01, 2026",
+            "hours": "378.00 hrs / 500 hrs",
+            "task_stage": "WIP"
         },
         {
+            "name": "Dataplex - R&D",
+            "phase": "NA",
             "project": "DataPlex Connectors (10013250)",
-            "phases": [],
-            "standalone_tasks": [
-                "AI - Assets"
-            ]
+            "project_manager": "Poojan Ghanshyam Trivedi",
+            "end_date": "Aug 31, 2026  starts on May 05, 2026",
+            "hours": "0 hrs / NA",
+            "task_stage": "Not Started"
+        },
+        {
+            "name": "Collibra - R&D",
+            "phase": "NA",
+            "project": "DataPlex Connectors (10013250)",
+            "project_manager": "Poojan Ghanshyam Trivedi",
+            "end_date": "Aug 31, 2026  starts on May 05, 2026",
+            "hours": "6.00 hrs / NA",
+            "task_stage": "Not Started"
+        },
+        {
+            "name": "Atlan - R&D",
+            "phase": "NA",
+            "project": "DataPlex Connectors (10013250)",
+            "project_manager": "Poojan Ghanshyam Trivedi",
+            "end_date": "Aug 31, 2026  starts on May 05, 2026",
+            "hours": "0 hrs / NA",
+            "task_stage": "Not Started"
         }
     ]
 }
