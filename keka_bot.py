@@ -168,10 +168,10 @@ class KekaBot:
                 "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12
             }
             upper = text.upper()
-            # Try "6 APR" or "APR 6" style
-            m = _re.search(r'(\d{1,2})\s+([A-Z]{3})', upper)
+            # Try "6 APR", "APR 6", "06APR", "APR06" style (optional spaces)
+            m = _re.search(r'(\d{1,2})\s*([A-Z]{3})', upper)
             if not m:
-                m = _re.search(r'([A-Z]{3})\s+(\d{1,2})', upper)
+                m = _re.search(r'([A-Z]{3})\s*(\d{1,2})', upper)
                 if m:
                     day, mon = int(m.group(2)), m.group(1)
                 else:
@@ -338,10 +338,12 @@ class KekaBot:
             
             # Additional wait for the dropdown panel to be definitely there
             try:
-                self.page.wait_for_selector(".dropdown-menu.show, bs-dropdown-container", timeout=2000, state="visible")
-                logger.debug("Dropdown panel verified visible")
+                self.page.wait_for_selector(".dropdown-menu.show, bs-dropdown-container, .side-panel, .slider", timeout=3000, state="visible")
+                logger.debug("Dropdown/Sidebar panel verified visible")
             except:
-                logger.debug("Dropdown panel not verified via selector, proceeding anyway")
+                logger.warning("Dropdown panel not found! Attempting click again...")
+                self._click_add_time_entry()
+                time.sleep(1.5)
             
             # Step 3: Select Project in sidebar
             self._select_project_in_sidebar(project)
@@ -559,7 +561,7 @@ class KekaBot:
                         
                         log.push("Iter " + (isSecondAttempt ? "2-" : "") + iterations + ": " + visibleItems.length + " items");
                         if (iterations === 1) {{
-                            log.push("Item 1-20: " + visibleItems.slice(0, 20).map(i => normalize(i.innerText)).join("|"));
+                            log.push("Top 10 items: " + visibleItems.slice(0, 10).map(i => i.innerText.trim()).join(" | "));
                         }}
                         
                         // Priority 1: Match Task Name
@@ -1669,6 +1671,7 @@ class KekaBot:
         selectors = [
             "button:has-text('Save')",
             "button:has-text('Submit')",
+            "button:has-text('Update')",
             "button[type='submit']",
         ]
         for sel in selectors:

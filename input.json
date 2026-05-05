@@ -1,19 +1,9 @@
 {
   "tasks": [
     {
-      "task": "AI - Assets",
+      "task": "ai assets",
       "date": "2026-05-07",
-      "duration_hours": 9
-    },
-    {
-      "task": "Collibra - R&D",
-      "date": "2026-05-08",
-      "duration_hours": 5
-    },
-    {
-      "task": "Dataplex - R&D",
-      "date": "2026-05-08",
-      "duration_hours": 3
+      "duration_hours": 8
     }
   ]
 }

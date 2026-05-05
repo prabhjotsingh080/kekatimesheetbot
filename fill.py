@@ -88,11 +88,14 @@ def find_project_and_task(input_task, mapping):
         
     return None, None, None
 
-def calculate_times(duration: float):
-    """Calculates a standard 09:00 start time and corresponding end time."""
-    start_time = "09:00"
-    end_hour = int(9 + duration)
-    end_minute = int(round((duration * 60) % 60))
+def calculate_times(duration: float, start_time_str: str = "09:00"):
+    """Calculates a start time and corresponding end time based on duration."""
+    h, m = map(int, start_time_str.split(":"))
+    
+    total_minutes = h * 60 + m + int(round(duration * 60))
+    
+    end_hour = total_minutes // 60
+    end_minute = total_minutes % 60
     
     # Simple clamp to avoid overflowing 24 hours format
     if end_hour >= 24:
@@ -100,7 +103,7 @@ def calculate_times(duration: float):
         end_minute = 59
         
     end_time = f"{end_hour:02d}:{end_minute:02d}"
-    return start_time, end_time
+    return start_time_str, end_time
 
 def main():
     load_env()
@@ -129,6 +132,8 @@ def main():
         console.print("[bold red]Could not load project mappings from output.json or fetched.json. Please ensure definitions exist.[/bold red]")
         sys.exit(1)
         
+    # To avoid overlaps, track the next available start time for each date
+    date_start_times = {}
     entries_to_fill = []
     
     console.print(f"Found {len(tasks)} tasks in input.json. Mapping to Keka counterparts...")
@@ -142,7 +147,12 @@ def main():
             console.print(f"[bold red]Could not find matching Keka project for task: '{task_name}'[/bold red]")
             continue
             
-        start_time, end_time = calculate_times(float(duration))
+        # Get next available start time for this date (default 09:00)
+        current_start = date_start_times.get(date_str, "09:00")
+        start_time, end_time = calculate_times(float(duration), current_start)
+        
+        # Update next start time for this date
+        date_start_times[date_str] = end_time
         
         entry = {
             "date": date_str,
